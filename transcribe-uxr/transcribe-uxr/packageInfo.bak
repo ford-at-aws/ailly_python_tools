@@ -1,0 +1,2 @@
+base = {workspace = fprior_transcribe-uxr; };
+packages = { };

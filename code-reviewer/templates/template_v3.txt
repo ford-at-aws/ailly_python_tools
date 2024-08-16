@@ -1,0 +1,1 @@
+Give me an unformatted list of all possible service-unique error codes that may return from the Service API's underlying the SDK method calls.

@@ -1,0 +1,84 @@
+Always return responses in the following format:
+{
+    "pagination": [
+        {
+            "file_name": "<path/to/analyzed_file>",
+            "line_number": "<line_number_of_issue>",
+            "api_ref": "<api_method_name>",
+            "sdk_api_ref": "<sdk_method_function_name>",
+            "recommended": "<recommended_paginator_class>",
+            "justification": "<details_context_max_50_chars>"
+        }
+    ],
+    "error_handling": [
+        {
+            "file_name": "<path/to/analyzed_file>",
+            "line_number": "<line_number_of_issue>",
+            "api_ref": "<api_method_name>",
+            "sdk_api_ref": "<sdk_method_function_name>",
+            "recommended": "<recommended_error_class>",
+            "justification": "<details_context_max_50_chars>"
+        }
+    ],
+    "waiters": [
+        {
+            "file_name": "<path/to/analyzed_file>",
+            "line_number": "<line_number_of_issue>",
+            "api_ref": "<api_method_name>",
+            "sdk_api_ref": "<sdk_method_function_name>",
+            "recommended": "<recommended_waiter_class>",
+            "justification": "<details_context_max_50_chars>"
+        }
+    ]
+}
+For example, for a stop_instances.py file:
+{
+    "pagination": [
+        {
+            "file_name": "aws-doc-sdk-examples/python/example_code/ec2/stop_instances.py",
+            "line_number": "19",
+            "api_ref": "DescribeInstances",
+            "sdk_api_ref": "EC2.Client.describe_instances",
+            "recommended": "EC2.Paginator.DescribeInstances",
+            "justification": "Paginator is available for this SDK function"
+        }
+    ],
+    "error_handling": [
+        {
+            "file_name": "aws-doc-sdk-examples/python/example_code/ec2/stop_instances.py",
+            "line_number": "45",
+            "api_ref": "StopInstances",
+            "sdk_api_ref": "EC2.Client.stop_instances",
+            "recommended": "EC2.exceptions.InvalidInstanceID.NotFound",
+            "justification": "Handle cases where the instance ID is invalid or does not exist."
+        },
+        {
+            "file_name": "aws-doc-sdk-examples/python/example_code/ec2/stop_instances.py",
+            "line_number": "45",
+            "api_ref": "StopInstances",
+            "sdk_api_ref": "EC2.Client.stop_instances",
+            "recommended": "EC2.exceptions.IncorrectInstanceState",
+            "justification": "Handle cases where the instance is in a state that does not allow stopping."
+        },
+        {
+            "file_name": "aws-doc-sdk-examples/python/example_code/ec2/stop_instances.py",
+            "line_number": "45",
+            "api_ref": "StopInstances",
+            "sdk_api_ref": "EC2.Client.stop_instances",
+            "recommended": "EC2.exceptions.UnauthorizedOperation",
+            "justification": "Handle cases where the user lacks permissions to stop the instance."
+        }
+    ],
+    "waiters": [
+        {
+            "file_name": "aws-doc-sdk-examples/python/example_code/ec2/stop_instances.py",
+            "line_number": "49",
+            "api_ref": "StopInstances",
+            "sdk_api_ref": "EC2.Client.stop_instances",
+            "recommended": "EC2.Waiter.InstanceStopped",
+            "justification": "Waiter is available to confirm instances are stopped."
+        }
+    ]
+}
+In the absence of high confidence recommendations, you must return an empty list for that category.
+

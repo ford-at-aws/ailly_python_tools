@@ -1,0 +1,32 @@
+For a provided file, use your best judgment to determine if the AWS SDK function calls invoked should implement:
+    - the service's Client class instead of Resource when interacting with the SDK
+    - pagination where available in the SDK function call in question
+    - waiters where available in the SDK function call in question
+    - service-unique, situation-aware, and thoughtful error handling for the SDK function call in question.
+    - for error handling, do not suggest general API or SDK handling and give me service-unique errors. Be very picky in your suggestions.
+
+A few other requests:
+   - Remove all need for user input! For moments where user input is required, create dynamic/random naming for each resource.
+   - Make sure you reimplement all code in classes
+
+A few other notes:
+   - Only make high confidence recommendations. Do not suggest comments be touched.
+   - Do not provide any additional information or commentary.
+   - Do not remove snippet-start/end comments.
+
+Lastly, here some code snippets comments that I want you to be on the lookout for. Do not delete them or touch them in any way if you encounter them! Nor touch any like them.
+- ec2.ruby.hello_ec2
+- ec2.Ruby.exampleKeyPairs
+- ec2.Ruby.exampleSecurityGroup
+- ec2.Ruby.startInstance
+- ec2.Ruby.stopInstances
+- ec2.Ruby.allocateElasticIPs
+- ec2.Ruby.associateElasticIPs
+- ec2.Ruby.releaseElasticIPs
+- ec2.Ruby.terminateInstances
+- ec2.Ruby.getAllInstances
+- ec2.Ruby.regionsAvailabilityZones
+- ec2.Ruby.createRouteTable
+- ec2.Ruby.createSubnet
+- ec2.Ruby.createVpc
+They will appear in this fomrat: # snippet-[start|end]:[ec2.Ruby.class.igw] as shown above in the code example.

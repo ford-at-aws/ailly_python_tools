@@ -1,0 +1,5 @@
+For a provided file, use your best judgment to determine which of the provided service-specific error codes that may appear in the usage of this SDK Service Client class.
+
+Be judicious in this answer, as some error codes are more higher-value and commonly encountered than others, e.g. A customers using the EC2 AllocateIP's API is highly likely to eventually encounter the AddressLimitExceeded exception.
+
+Give me only the high value error codes that seem to suit well the use case, and provide concise but authoratative justifcation for your answer.

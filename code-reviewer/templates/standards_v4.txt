@@ -1,0 +1,5 @@
+Python standards:
+
+- Each file shall contain its own loggins setup: logger = logging.getLogger(__name__)
+- Each containing "wrapper" code for SDK function calls, call the class Wrapper.
+

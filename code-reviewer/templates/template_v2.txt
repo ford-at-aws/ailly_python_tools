@@ -1,0 +1,10 @@
+Return responses by implementing the suggestions in a fully functional file.
+
+Do not remove snippet-start/end comments. This is extremely important.
+
+For example, your resposne should be:
+<code>
+CODE GOES HERE
+</code>
+
+Where 'CODE GOES HERE' is Ruby code implementing the standards recommendations.
