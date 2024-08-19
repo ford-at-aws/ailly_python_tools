@@ -1,0 +1,19 @@
+# Ignore build artifacts
+build/
+
+# Ignore dynamically generated output files
+latest_output_dir.txt
+uxr_analysis/latest_output_dir.txt
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+*.egg-info/
+dist/
+
