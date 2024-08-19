@@ -12,7 +12,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "uxr_analysis=uxr_analysis.cli:main",
+            "uxr_analysis=src.cli:main",
         ],
     },
 )

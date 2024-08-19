@@ -23,11 +23,25 @@ logger = logging.getLogger(__name__)
 
 
 class Uploader:
-    def __init__(self, directory, output_dir):
-        self.directory = directory
+    def __init__(self, output_dir):
+        # Prompt the user for the video directory
+        self.directory = self.get_video_directory()
         self.output_dir = output_dir
         self.config_data = {}
         self.config_file = os.path.join(output_dir, "uxr_config.json")
+
+        # Save the video directory to the config
+        self.config_data["video_directory"] = self.directory
+        ConfigManager.save_config(self.config_data, self.output_dir)
+
+    def get_video_directory(self):
+        """Prompt the user for the video directory."""
+        while True:
+            directory = input("Enter the directory containing the videos: ").strip()
+            if os.path.isdir(directory):
+                return directory
+            else:
+                print(f"Invalid directory: {directory}. Please try again.")
 
     def print_banner(self, banner_text):
         """Print a banner."""
@@ -41,7 +55,8 @@ class Uploader:
     def select_template_directory(self):
         breakpoint()
         """Allow user to select a directory from the templates folder and validate it contains the required files."""
-        templates_dir = "templates"
+        templates_dir = "src/templates"
+        print("WTF")
         available_dirs = [
             d for d in os.listdir(templates_dir) if os.path.isdir(os.path.join(templates_dir, d))
         ]
