@@ -42,8 +42,7 @@ def main():
         choice = input("Enter your choice (1-6): ")
 
         if choice == "1":
-            directory = input("Enter the directory containing the videos: ")
-            uploader = Uploader(directory, latest_output_dir)
+            uploader = Uploader(latest_output_dir)
             uploader.upload_videos()
         elif choice == "2":
             monitor = TranscriptionJobMonitor(latest_output_dir)

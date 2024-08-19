@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class Uploader:
     def __init__(self, directory, output_dir):
         self.directory = directory
-        self.output_dir = output_dir  # New parameter for output directory
+        self.output_dir = output_dir
         self.config_data = {}
         self.config_file = os.path.join(output_dir, "uxr_config.json")
 
@@ -37,6 +37,44 @@ class Uploader:
         ===============================
         """
         print(banner)
+
+    def select_template_directory(self):
+        breakpoint()
+        """Allow user to select a directory from the templates folder and validate it contains the required files."""
+        templates_dir = "templates"
+        available_dirs = [
+            d for d in os.listdir(templates_dir) if os.path.isdir(os.path.join(templates_dir, d))
+        ]
+
+        if not available_dirs:
+            raise FileNotFoundError("No template directories found in the 'templates' folder.")
+
+        print("Available template directories:")
+        for i, directory in enumerate(available_dirs, 1):
+            print(f"{i}. {directory}")
+
+        selected_index = int(input("Select a template directory by number: ")) - 1
+
+        if selected_index < 0 or selected_index >= len(available_dirs):
+            raise ValueError("Invalid selection. Please choose a valid directory number.")
+
+        selected_dir = os.path.join(templates_dir, available_dirs[selected_index])
+
+        methodology_path = os.path.abspath(os.path.join(selected_dir, "methodology.txt"))
+        rubric_path = os.path.abspath(os.path.join(selected_dir, "rubric.txt"))
+
+        if not os.path.exists(methodology_path) or not os.path.exists(rubric_path):
+            raise FileNotFoundError(
+                f"The selected directory '{selected_dir}' must contain both 'methodology.txt' and 'rubric.txt'."
+            )
+
+        self.config_data["methodology"] = methodology_path
+        self.config_data["rubric"] = rubric_path
+        ConfigManager.save_config(self.config_data, self.output_dir)
+
+        logger.info(f"Selected template directory: {selected_dir}")
+        logger.info(f"Methodology path: {methodology_path}")
+        logger.info(f"Rubric path: {rubric_path}")
 
     def create_s3_bucket(self, bucket_name):
         """Create an S3 bucket."""
@@ -81,7 +119,6 @@ class Uploader:
 
     def estimate_transcription_time(self, file_size):
         """Estimate the transcription time based on file size."""
-        # Transcription time is 1.5 seconds per MB
         return (file_size / (1024 * 1024)) * 1.5  # 1.5 seconds per MB
 
     def sanitize_s3_key(self, key):
@@ -156,6 +193,10 @@ class Uploader:
         """Upload videos from a directory to S3 and start transcription jobs."""
         self.print_banner("UXR Analysis - Video Upload")
 
+        # Select template directory and validate files
+        self.select_template_directory()
+
+        breakpoint()
         bucket_name = self.check_previous_run()
         if not bucket_name:
             bucket_name = input("Please enter a name for the S3 bucket: ").strip()
