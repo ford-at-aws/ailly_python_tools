@@ -3,7 +3,7 @@ from .scorer import Scorer
 from .summarizer import Summarizer
 from .uploader import Uploader
 from .monitor_transcription import TranscriptionJobMonitor
-from .config_manager import ConfigManager  # Import the ConfigManager
+from .config_manager import ConfigManager
 import time
 import os
 

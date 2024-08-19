@@ -2,4 +2,3 @@ boto3
 pandas
 markdown
 tabulate
-curses
