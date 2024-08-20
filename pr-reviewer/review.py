@@ -31,7 +31,7 @@ class StandardsProcessor:
         self.standards_dir = os.path.join(os.getcwd(), "standards")
         self.unique_dir = os.path.join(self.standards_dir, f"{self.org_repo.replace('/', '_')}_{self.branch}")
         self.start_dir = os.getcwd()
-        self.top_level_standards_file = os.path.join(self.start_dir, "standards.html")
+        self.top_level_standards_file = os.path.join(self.start_dir, "templates", "standards.html")
         self.local_branch = f"pr-{self.branch}"
         self.remote_name = "temp_remote"
         self.remote_url = f"https://github.com/{self.org_repo}.git"
@@ -134,7 +134,7 @@ class StandardsProcessor:
         Perform git operations to fetch the PR branch and generate the diff file.
         """
         try:
-            sdk_path = os.path.join("..", "aws-doc-sdk-examples")
+            sdk_path = os.path.join("..", "..", "aws-doc-sdk-examples")
             if not os.path.isdir(sdk_path):
                 logging.error("Error: Unable to navigate to the specified AWS SDK directory.")
                 raise ArgumentError("Invalid AWS SDK directory")
