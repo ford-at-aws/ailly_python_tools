@@ -1,0 +1,32 @@
+---
+prompt: |
+    Based on the feedback provided below, rate each of the following metrics on a scale of 1-100. Provide a specific fact-based justification for each score. Return the data in tabular format with columns for Rating Type, Score, and Justification.
+
+    Metrics to rate:
+    1. User Satisfaction
+    2. Ease of Use
+    3. Task Completion Rate
+    4. Error Rate
+    5. Time on Task
+    6. Net Promoter Score (NPS)
+    7. Usability Score
+    8. Engagement Level
+    9. Feature Discoverability
+    10. Learnability
+    11. User Feedback Sentiment
+    12. System Usability Scale (SUS)
+    13. Customer Effort Score (CES)
+    14. Retention Rate
+    15. Cognitive Load
+
+    For each metric, provide the score and a justification in the following format:
+
+    Rating Type | Score | Justification
+    ------------|-------|--------------
+    [Metric Name] | [1-100] | [Brief justification based on the feedback]
+
+    Example:
+    Rating Type | Score | Justification
+    ------------|-------|--------------
+    User Satisfaction | 90 | The participant stated the experience was "positive" and "helpful".
+---

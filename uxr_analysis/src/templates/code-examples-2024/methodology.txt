@@ -1,0 +1,8 @@
+---
+prompt: >
+    You are tasked with summarizing a user testing study transcript conducted by the SDK Code Examples team at AWS. The study follows a specific set of steps, and participants were asked to comment or answer questions during each step. Your goal is to extract the participant's responses and comments for each step based on the context provided.
+
+    The template used for the study is as follows:
+
+    Copy from internal docs
+---

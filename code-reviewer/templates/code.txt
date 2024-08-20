@@ -1,0 +1,115 @@
+Here is a random file containing some best practices implemented, to give you inspiration.
+
+Do not replicate this file! I'm just providing it for general inspiration so you know what these best practice look like when implemented for a random use case.
+
+require 'aws-sdk-ec2'
+require 'securerandom'
+require 'logger'
+
+# snippet-start:[ec2.Ruby.class.igw]
+class InternetGatewayManager
+  # Initializes the InternetGatewayManager with an EC2 client and logger.
+  #
+  # @param region [String, nil] The AWS region where the EC2 client will operate.
+  # @param ec2_client [Aws::EC2::Client, nil] The EC2 client instance. If nil, a new client will be created.
+  # @param logger [Logger] The logger instance used for logging.
+  def initialize(region: Aws.config[:region], ec2_client: nil, logger: Logger.new($stdout))
+    @ec2_client = ec2_client || Aws::EC2::Client.new(region: region)
+    @logger = logger
+  end
+
+  # snippet-start:[ec2.Ruby.create-igw]
+  # Creates an Internet Gateway and waits until it is available.
+  #
+  # @return [String] The ID of the created Internet Gateway.
+  # @raise [Aws::Waiters::Errors::WaiterFailed] If the Internet Gateway fails to become available.
+  # @raise [Aws::Waiters::Errors::TooManyAttemptsError] If the maximum number of wait attempts is reached.
+  def create_internet_gateway
+    response = @ec2_client.create_internet_gateway
+    igw_id = response.internet_gateway.internet_gateway_id
+    @logger.info("Created Internet Gateway with ID '#{igw_id}'.")
+
+    # Wait until the Internet Gateway is available
+    begin
+      @ec2_client.wait_until(:internet_gateway_exists, internet_gateway_ids: [igw_id], max_attempts: 20, delay: 15)
+      @logger.info("Internet Gateway '#{igw_id}' is now available.")
+    rescue Aws::Waiters::Errors::WaiterFailed => e
+      @logger.error("Failed to create instance: Address limit exceeded. Release unused IP addresses or request a limit increase. Details: #{e.message}")
+      raise
+    rescue Aws::Waiters::Errors::TooManyAttemptsError => e
+      @logger.error("Max attempts reached while waiting for Internet Gateway '#{igw_id}': #{e.message}")
+      raise
+    end
+    igw_id
+  end
+  # snippet-end:[ec2.Ruby.create-igw]
+
+  # snippet-start:[ec2.Ruby.attach-igw]
+  # Attaches the specified Internet Gateway to a VPC and tags the Internet Gateway.
+  #
+  # @param igw_id [String] The ID of the Internet Gateway.
+  # @param vpc_id [String] The ID of the VPC to which the Internet Gateway will be attached.
+  # @param tag_key [String] The key of the tag to add to the Internet Gateway.
+  # @param tag_value [String] The value of the tag to add to the Internet Gateway.
+  # @return [Boolean] Returns true if the attachment and tagging were successful.
+  # @raise [Aws::EC2::Errors::ServiceError] If the attachment or tagging fails.
+  def attach_internet_gateway_to_vpc(igw_id, vpc_id, tag_key, tag_value)
+    begin
+      @ec2_client.attach_internet_gateway(internet_gateway_id: igw_id, vpc_id: vpc_id)
+      @logger.info("Attached Internet Gateway '#{igw_id}' to VPC '#{vpc_id}'.")
+
+      # Tag the Internet Gateway
+      @ec2_client.create_tags(resources: [igw_id], tags: [{ key: tag_key, value: tag_value }])
+      @logger.info("Tagged Internet Gateway '#{igw_id}' with #{tag_key}: #{tag_value}.")
+    rescue Aws::EC2::Errors::ServiceError => e
+      @logger.error("Failed to attach Internet Gateway '#{igw_id}' to VPC '#{vpc_id}': #{e.message}")
+      raise
+    end
+    true
+  end
+  # snippet-end:[ec2.Ruby.attach-igw]
+
+  # snippet-start:[ec2.Ruby.list-instances]
+  # Lists all EC2 instances in the specified region using a paginator.
+  #
+  # This method will iterate through all pages of results returned by the describe_instances API call,
+  # logging each instance ID and its state.
+  def list_instances
+    @logger.info("Listing all EC2 instances...")
+
+    # Use the paginator to handle multiple pages of results from the describe_instances API call.
+    paginator = @ec2_client.describe_instances.paginator
+
+    # Iterate over each page of results
+    paginator.each_page do |page|
+      # Process each reservation in the current page
+      page.reservations.each do |reservation|
+        # Process each instance within the current reservation
+        reservation.instances.each do |instance|
+          @logger.info("Found instance with ID '#{instance.instance_id}', state '#{instance.state.name}'.")
+        end
+      end
+    end
+  end
+  # snippet-end:[ec2.Ruby.list-instances]
+end
+# snippet-end:[ec2.Ruby.class.igw]
+
+if $PROGRAM_NAME == __FILE__
+  vpc_id = "vpc-#{SecureRandom.hex(4)}"
+  tag_key = "Name"
+  tag_value = "IGW-#{SecureRandom.hex(4)}"
+  region = "us-east-1"
+
+  ec2_client = Aws::EC2::Client.new(region: region)
+  igw_manager = InternetGatewayManager.new(region: region, ec2_client: ec2_client)
+
+  begin
+    igw_id = igw_manager.create_internet_gateway
+    if igw_manager.attach_internet_gateway_to_vpc(igw_id, vpc_id, tag_key, tag_value)
+      puts "Successfully created and attached Internet Gateway '#{igw_id}' to VPC '#{vpc_id}'."
+    end
+  rescue => e
+    puts "Failed to create and attach Internet Gateway: #{e.message}"
+  end
+end
