@@ -1,20 +1,34 @@
+import os
+import time
+
+from .config_manager import ConfigManager
+from .monitor_transcription import TranscriptionJobMonitor
 from .processor import Processor
 from .scorer import Scorer
 from .summarizer import Summarizer
 from .uploader import Uploader
-from .monitor_transcription import TranscriptionJobMonitor
-from .config_manager import ConfigManager
-import time
-import os
 
-def main():
-    ascii_art = '''\n
+
+def main() -> None:
+    """
+    Main function to execute the UXR Analysis Tool.
+
+    This function displays a menu to the user and performs various operations
+    such as uploading videos, monitoring transcription jobs, processing transcripts,
+    summarizing the processed transcripts, and scoring the summarized results.
+
+    The function also handles the creation or usage of the latest output directory
+    where all outputs will be stored.
+    """
+
+    # ASCII art banner
+    ascii_art = """\n
             ██    ██ ██   ██ ██████       █████  ███    ██  █████  ██      ██    ██ ███████ ██ ███████ 
             ██    ██  ██ ██  ██   ██     ██   ██ ████   ██ ██   ██ ██       ██  ██  ██      ██ ██      
             ██    ██   ███   ██████      ███████ ██ ██  ██ ███████ ██        ████   ███████ ██ ███████ 
             ██    ██  ██ ██  ██   ██     ██   ██ ██  ██ ██ ██   ██ ██         ██         ██ ██      ██ 
              ██████  ██   ██ ██   ██     ██   ██ ██   ████ ██   ██ ███████    ██    ███████ ██ ███████ 
-            '''
+            """
 
     print(ascii_art)
 

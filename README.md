@@ -11,3 +11,6 @@ The Ailly primitives (see CLI) lack a few features, so the projects in this repo
 
 # Cost warning
 Note that these scripts interact with AWS, which costs money. Proceed with caution in this regard and track usage using [best practices](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-best-practices.html).
+
+# LLM warning
+This tooling generates output using LLM's. Please review for factual accuracy.

@@ -1,6 +1,7 @@
 import os
 import shutil
 import subprocess
+
 from git import Repo
 
 # Configuration
@@ -31,10 +32,11 @@ for root, _, files in os.walk(local_copy_dir):
             rst_file = os.path.join(root, file)
             md_file = os.path.join(root, file.replace(".rst", ".md"))
             print(f"Converting {rst_file} to {md_file}...")
-            subprocess.run(["pandoc", "-f", "rst", "-t", "markdown", "-o", md_file, rst_file])
+            subprocess.run(
+                ["pandoc", "-f", "rst", "-t", "markdown", "-o", md_file, rst_file]
+            )
 
 print("Conversion complete!")
 
 # Clean up the cloned repository
 shutil.rmtree(local_repo_dir)
-

@@ -1,8 +1,8 @@
+import logging
 import os
 import shutil
-import logging
-from datetime import datetime
 import subprocess
+from datetime import datetime
 from typing import List, Tuple
 
 
@@ -22,7 +22,7 @@ def create_temp_directory() -> Tuple[str, str, str]:
 
 def write_files_to_process(python_files: List[str], file_path: str) -> None:
     """Writes a list of Python files to the specified file."""
-    with open(file_path, 'w') as f:
+    with open(file_path, "w") as f:
         for file in python_files:
             f.write(f"{file}\n")
     logging.info(f"Wrote {len(python_files)} files to {file_path}")
@@ -33,7 +33,7 @@ def read_files_to_process(file_path: str) -> List[str]:
     if not os.path.exists(file_path):
         return []
 
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         files = [line.strip() for line in f if line.strip()]
     logging.info(f"Loaded {len(files)} files from {file_path}")
     return files
@@ -44,7 +44,7 @@ def remove_processed_file(processed_file: str, file_path: str) -> None:
     files = read_files_to_process(file_path)
     files = [file for file in files if file != processed_file]
 
-    with open(file_path, 'w') as f:
+    with open(file_path, "w") as f:
         for file in files:
             f.write(f"{file}\n")
 
@@ -53,15 +53,17 @@ def remove_processed_file(processed_file: str, file_path: str) -> None:
 
 def load_template_content(template_name: str) -> str:
     """Loads the content of a template file from the 'templates' directory."""
-    template_path = os.path.join('templates', template_name)
+    template_path = os.path.join("templates", template_name)
     if not os.path.exists(template_path):
         logging.error(f"Template {template_name} not found in 'templates' directory.")
         return ""
-    with open(template_path, 'r') as file:
+    with open(template_path, "r") as file:
         return file.read()
 
 
-def copy_and_prepare_files(file: str, in_dir: str, temp_dir: str, out_dir: str, prepare_content_func) -> None:
+def copy_and_prepare_files(
+    file: str, in_dir: str, temp_dir: str, out_dir: str, prepare_content_func
+) -> None:
     """Copies the file to the input directory, prepares it, and processes it."""
     prepare_content_func(temp_dir)
     shutil.copy(file, in_dir)
@@ -73,7 +75,7 @@ def copy_and_prepare_files(file: str, in_dir: str, temp_dir: str, out_dir: str, 
 
     original_content = read_contents(file)
 
-    with open(new_filepath, 'w') as new_file:
+    with open(new_filepath, "w") as new_file:
         new_file.write(f"# File analyzed: {file}\n")
         new_file.write(original_content)
 
@@ -86,21 +88,27 @@ def copy_and_prepare_files(file: str, in_dir: str, temp_dir: str, out_dir: str, 
         logging.info(f"Deleted file {new_filepath} after running 'ailly'")
 
 
-def run_ailly_command(temp_dir: str, out_dir: str, file_name: str, original_filepath: str) -> None:
+def run_ailly_command(
+    temp_dir: str, out_dir: str, file_name: str, original_filepath: str
+) -> None:
     """Runs the 'ailly' command on the specified file and handles the output."""
     try:
         command = f"ailly {file_name}"
         logging.info(f"Running command: {command} in directory: {temp_dir}")
 
-        result = subprocess.run(command, cwd=temp_dir, capture_output=True, text=True, shell=True)
+        result = subprocess.run(
+            command, cwd=temp_dir, capture_output=True, text=True, shell=True
+        )
         logging.info(f"'ailly' command output:\n{result.stdout}")
 
         for root, dirs, files in os.walk(temp_dir):
             for file in files:
-                if file.endswith('.ailly.md'):
+                if file.endswith(".ailly.md"):
                     source_file = os.path.join(root, file)
-                    renamed_file = os.path.join(out_dir,
-                                                f"{os.path.splitext(os.path.basename(original_filepath))[0]}.md")
+                    renamed_file = os.path.join(
+                        out_dir,
+                        f"{os.path.splitext(os.path.basename(original_filepath))[0]}.md",
+                    )
                     shutil.move(source_file, renamed_file)
                     logging.info(f"Moved and renamed '{file}' to '{renamed_file}'")
 
@@ -117,9 +125,9 @@ def list_python_files(directory: str) -> List[str]:
     """Lists all Python files in the given directory."""
     python_files = []
     for root, dirs, files in os.walk(directory):
-        dirs[:] = [d for d in dirs if d != 'test_tools']
+        dirs[:] = [d for d in dirs if d != "test_tools"]
         for file in files:
-            if file.endswith('.py') and not file.startswith('test_'):
+            if file.endswith(".py") and not file.startswith("test_"):
                 file_path = os.path.join(root, file)
                 python_files.append(file_path)
 
@@ -131,9 +139,9 @@ def list_ruby_files(directory: str) -> List[str]:
     """Lists all Ruby files in the given directory."""
     ruby_files = []
     for root, dirs, files in os.walk(directory):
-        dirs[:] = [d for d in dirs if d != 'test_tools']
+        dirs[:] = [d for d in dirs if d != "test_tools"]
         for file in files:
-            if file.endswith('.rb') and not file.startswith('test_'):
+            if file.endswith(".rb") and not file.startswith("test_"):
                 file_path = os.path.join(root, file)
                 ruby_files.append(file_path)
 
@@ -141,8 +149,14 @@ def list_ruby_files(directory: str) -> List[str]:
     return ruby_files
 
 
-def process_file(file: str, in_dir: str, temp_dir: str, out_dir: str, files_to_process_path: str,
-                 prepare_content_func) -> None:
+def process_file(
+    file: str,
+    in_dir: str,
+    temp_dir: str,
+    out_dir: str,
+    files_to_process_path: str,
+    prepare_content_func,
+) -> None:
     """Processes a file by copying, preparing, and removing it."""
     logging.info(f"Processing file: {file}")
     copy_and_prepare_files(file, in_dir, temp_dir, out_dir, prepare_content_func)

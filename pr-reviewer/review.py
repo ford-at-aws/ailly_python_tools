@@ -1,10 +1,11 @@
 import glob
+import logging
 import os
 import re
 import shutil
 import subprocess
 import sys
-import logging
+
 
 def convert_to_gray_matter_header(content):
     """
@@ -14,8 +15,11 @@ def convert_to_gray_matter_header(content):
 prompt: |
     {}
 combined: true
----""".format(content.replace('\n', '\n    '))
+---""".format(
+        content.replace("\n", "\n    ")
+    )
     return header_content
+
 
 class StandardsProcessor:
     def __init__(self, fork_url):
@@ -26,12 +30,16 @@ class StandardsProcessor:
             fork_url (str): The URL of the forked repository.
         """
         self.fork_url = fork_url
-        self.org_repo = '/'.join(fork_url.split('/')[3:5])
-        self.branch = fork_url.split('/')[-1]
+        self.org_repo = "/".join(fork_url.split("/")[3:5])
+        self.branch = fork_url.split("/")[-1]
         self.standards_dir = os.path.join(os.getcwd(), "standards")
-        self.unique_dir = os.path.join(self.standards_dir, f"{self.org_repo.replace('/', '_')}_{self.branch}")
+        self.unique_dir = os.path.join(
+            self.standards_dir, f"{self.org_repo.replace('/', '_')}_{self.branch}"
+        )
         self.start_dir = os.getcwd()
-        self.top_level_standards_file = os.path.join(self.start_dir, "templates", "standards.html")
+        self.top_level_standards_file = os.path.join(
+            self.start_dir, "templates", "standards.html"
+        )
         self.local_branch = f"pr-{self.branch}"
         self.remote_name = "temp_remote"
         self.remote_url = f"https://github.com/{self.org_repo}.git"
@@ -46,7 +54,9 @@ class StandardsProcessor:
         """
         Set up logging configuration.
         """
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+        logging.basicConfig(
+            level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+        )
 
     @staticmethod
     def sanitize_filename(filename):
@@ -98,10 +108,14 @@ class StandardsProcessor:
         for section in sections:
             header = section.split("<summary><h2>")[1].split("</h2></summary>")[0]
             content = section.split("</summary>")[1].strip()
-            sanitized_header = self.sanitize_filename(header.lower().replace(' ', '_'))
-            filename = os.path.join(self.unique_dir, f"{file_number}_{sanitized_header}.md")
+            sanitized_header = self.sanitize_filename(header.lower().replace(" ", "_"))
+            filename = os.path.join(
+                self.unique_dir, f"{file_number}_{sanitized_header}.md"
+            )
 
-            gray_matter_content = convert_to_gray_matter_header(content.strip("</details>"))
+            gray_matter_content = convert_to_gray_matter_header(
+                content.strip("</details>")
+            )
 
             with open(filename, "w") as file:
                 file.write(gray_matter_content)
@@ -128,7 +142,7 @@ class StandardsProcessor:
         aillyrc = os.path.join(self.unique_dir, f".aillyrc")
         with open(aillyrc, "w") as file:
             file.write(aillyrc_content)
-    
+
     def git_operations(self):
         """
         Perform git operations to fetch the PR branch and generate the diff file.
@@ -136,20 +150,36 @@ class StandardsProcessor:
         try:
             sdk_path = os.path.join("..", "..", "aws-doc-sdk-examples")
             if not os.path.isdir(sdk_path):
-                logging.error("Error: Unable to navigate to the specified AWS SDK directory.")
+                logging.error(
+                    "Error: Unable to navigate to the specified AWS SDK directory."
+                )
                 raise ArgumentError("Invalid AWS SDK directory")
 
             os.chdir(sdk_path)
             logging.info(f"Navigated to: {sdk_path}")
 
-            subprocess.run(["git", "remote", "add", self.remote_name, self.remote_url], check=True)
-            subprocess.run(["git", "fetch", self.remote_name, f"{self.branch}:{self.local_branch}"], check=True)
+            subprocess.run(
+                ["git", "remote", "add", self.remote_name, self.remote_url], check=True
+            )
+            subprocess.run(
+                [
+                    "git",
+                    "fetch",
+                    self.remote_name,
+                    f"{self.branch}:{self.local_branch}",
+                ],
+                check=True,
+            )
             subprocess.run(["git", "checkout", self.main_branch], check=True)
             subprocess.run(["git", "pull", "origin", self.main_branch], check=True)
             logging.info(f"Fetched and checked out branch: {self.branch}")
 
             with open(self.diff_file, "w") as diff_file:
-                subprocess.run(["git", "diff", f"{self.main_branch}...{self.local_branch}"], stdout=diff_file, check=True)
+                subprocess.run(
+                    ["git", "diff", f"{self.main_branch}...{self.local_branch}"],
+                    stdout=diff_file,
+                    check=True,
+                )
             logging.info(f"Generated diff and saved to: {self.diff_file}")
 
             subprocess.run(["git", "branch", "-D", self.local_branch], check=True)
@@ -171,11 +201,13 @@ class StandardsProcessor:
         diff_md_filename = os.path.basename(self.diff_md_file)
         unique_diff_md_file = os.path.join(self.unique_dir, diff_md_filename)
 
-        with open(unique_diff_md_file, 'w') as md_file:
-            md_file.write("---\nprompt: This is a git diff describing the change and that I would like for a software engineer to review for standards.\nskip: true\n---\n")
-            with open(self.diff_file, 'r') as diff_file:
+        with open(unique_diff_md_file, "w") as md_file:
+            md_file.write(
+                "---\nprompt: This is a git diff describing the change and that I would like for a software engineer to review for standards.\nskip: true\n---\n"
+            )
+            with open(self.diff_file, "r") as diff_file:
                 md_file.write(diff_file.read())
-        
+
         logging.info(f"Created markdown file with greymatter head: {self.diff_md_file}")
 
     def run_ailly(self):
@@ -198,20 +230,19 @@ class StandardsProcessor:
         """
         for file in os.listdir(self.unique_dir):
             if file.endswith(".ailly.md"):
-                new_name = re.sub(r'^\d+_', '', file).replace('.ailly.md', '')
+                new_name = re.sub(r"^\d+_", "", file).replace(".ailly.md", "")
                 old_path = os.path.join(self.unique_dir, file)
                 new_path = os.path.join(self.unique_dir, new_name)
                 os.rename(old_path, new_path)
                 logging.info(f"Renamed file {old_path} to {new_path}")
 
         # Define a pattern to match files with a numeric prefix
-        pattern = os.path.join(self.unique_dir, '[0-9]*')
+        pattern = os.path.join(self.unique_dir, "[0-9]*")
         files_to_delete = glob.glob(pattern)
         for file in files_to_delete:
-            if re.match(r'^\d', os.path.basename(file)):
+            if re.match(r"^\d", os.path.basename(file)):
                 os.remove(file)
-                print(f'Deleted: {file}')
-
+                print(f"Deleted: {file}")
 
     def run(self):
         """
@@ -226,6 +257,7 @@ class StandardsProcessor:
         self.run_ailly()
         self.rename_files()
         logging.info("Processing complete.")
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
